@@ -13,7 +13,20 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-export const firebaseApp: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
-export const auth: Auth = getAuth(firebaseApp);
-export const rtdb: Database = getDatabase(firebaseApp);
-export const googleProvider = new GoogleAuthProvider();
+// Skip Firebase initialisation when we're in the server-side prerender path
+// AND the env vars haven't been baked in yet. The whole app is "use client",
+// so nothing touches these exports during SSG — but module evaluation alone
+// used to call initializeApp() with undefined values and crash the build.
+const isClient = typeof window !== "undefined";
+const hasConfig = !!firebaseConfig.apiKey;
+const live = isClient || hasConfig;
+
+export const firebaseApp: FirebaseApp = live
+  ? (getApps().length ? getApp() : initializeApp(firebaseConfig))
+  : ({} as FirebaseApp);
+
+export const auth: Auth = live ? getAuth(firebaseApp) : ({} as Auth);
+export const rtdb: Database = live ? getDatabase(firebaseApp) : ({} as Database);
+export const googleProvider: GoogleAuthProvider = live
+  ? new GoogleAuthProvider()
+  : ({} as GoogleAuthProvider);
