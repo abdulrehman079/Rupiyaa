@@ -1,0 +1,21 @@
+.snowflake/
+
+# Environment variables
+.env*.local
+
+# Common ignores
+node_modules
+.next/
+.DS_Store
+
+# Build outputs
+out/
+android/app/build/
+android/.gradle/
+android/build/
+android/local.properties
+
+# Signing — NEVER commit
+*.keystore
+*.jks
+keystore.properties

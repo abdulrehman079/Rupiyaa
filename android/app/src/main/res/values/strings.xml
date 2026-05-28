@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Rupiyaa</string>
+    <string name="title_activity_main">Rupiyaa</string>
+    <string name="package_name">com.rupiyaa.app</string>
+    <string name="custom_url_scheme">com.rupiyaa.app</string>
+</resources>
