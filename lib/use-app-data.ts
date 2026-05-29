@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ref, onValue, set } from "firebase/database";
 import { rtdb } from "./firebase";
 import { useAuth } from "./auth-context";
+import { stripUndefined } from "./utils";
 
 type AppDataShape = {
   accounts: unknown[];
@@ -114,8 +115,9 @@ export function useAppData<T extends AppDataShape>(seed: T) {
         setData(fromLocal);
         writeLocal(key, fromLocal);
         try {
-          await set(userRef, fromLocal);
-          lastCloudJson.current = JSON.stringify(normalize(seed, fromLocal));
+          const clean = stripUndefined(fromLocal);
+          await set(userRef, clean);
+          lastCloudJson.current = JSON.stringify(normalize(seed, clean));
           if (typeof window !== "undefined") localStorage.removeItem(LEGACY_KEY);
           setSync("synced");
         } catch {
@@ -156,8 +158,9 @@ export function useAppData<T extends AppDataShape>(seed: T) {
     setSync("saving");
     writeTimer.current = setTimeout(async () => {
       try {
-        await set(ref(rtdb, `users/${user.uid}/data`), data);
-        lastCloudJson.current = JSON.stringify(data);
+        const clean = stripUndefined(data);
+        await set(ref(rtdb, `users/${user.uid}/data`), clean);
+        lastCloudJson.current = JSON.stringify(clean);
         setSync("synced");
       } catch {
         // Stay offline — the local write is safe; we'll retry on the next edit

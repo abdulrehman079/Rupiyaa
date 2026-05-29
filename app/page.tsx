@@ -35,7 +35,7 @@ import {
   ArrowUpRight,
   ArrowDownLeft,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, stripUndefined } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
 import { useAppData } from "@/lib/use-app-data";
 import { useAndroidBack } from "@/lib/use-android-back";
@@ -2582,9 +2582,10 @@ function AuthedApp() {
       try {
         const now = Date.now();
         const key = new Date(now).toISOString().replace(/[:.]/g, "-");
+        const clean = stripUndefined(data);
         await Promise.all([
-          dbSet(dbRef(rtdb, `users/${user.uid}/data`), data),
-          dbSet(dbRef(rtdb, `users/${user.uid}/backups/${key}`), { at: now, data }),
+          dbSet(dbRef(rtdb, `users/${user.uid}/data`), clean),
+          dbSet(dbRef(rtdb, `users/${user.uid}/backups/${key}`), { at: now, data: clean }),
         ]);
         setLastBackup(now);
         alert("Backup saved to Firebase.");
