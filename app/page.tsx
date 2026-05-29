@@ -461,7 +461,10 @@ export default function App() {
   if (authLoading) {
     return (
       <div className="min-h-screen grid place-items-center bg-background text-foreground">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        <div className="relative">
+          <span aria-hidden="true" className="anim-logo-orbit absolute inset-0 -m-3 rounded-3xl border-2 border-primary/30 border-t-primary" />
+          <img src="/logo.png" alt="Rupiyaa" className="anim-logo-loader w-16 h-16 rounded-2xl object-cover relative" />
+        </div>
       </div>
     );
   }
@@ -2966,8 +2969,11 @@ function AuthedApp() {
 
         {/* Centered loader hint */}
         <div className="fixed inset-0 grid place-items-center pointer-events-none">
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-background/80 backdrop-blur border border-border shadow-lg">
-            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+          <div className="flex flex-col items-center gap-3 px-5 py-4 rounded-2xl bg-background/85 backdrop-blur border border-border shadow-xl">
+            <div className="relative">
+              <span aria-hidden="true" className="anim-logo-orbit absolute inset-0 -m-2 rounded-2xl border-2 border-primary/30 border-t-primary" />
+              <img src="/logo.png" alt="Rupiyaa" className="anim-logo-loader w-12 h-12 rounded-xl object-cover relative" />
+            </div>
             <span className="text-xs text-muted-foreground">Loading your data…</span>
           </div>
         </div>
