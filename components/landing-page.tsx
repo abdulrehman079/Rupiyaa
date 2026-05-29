@@ -141,7 +141,7 @@ function WelcomeScreen({ onContinue }: { onContinue: () => void }) {
             type="button"
             onClick={onContinue}
             aria-label="Continue"
-            className="flex-shrink-0 inline-flex items-center gap-2 pl-4 pr-2 py-2 rounded-full bg-primary text-zinc-900 shadow-[0_8px_24px_-6px_rgba(233,168,37,0.6)] active:scale-95 transition-transform"
+            className="shrink-0 inline-flex items-center gap-2 pl-4 pr-2 py-2 rounded-full bg-primary text-zinc-900 shadow-[0_8px_24px_-6px_rgba(233,168,37,0.6)] active:scale-95 transition-transform"
           >
             <span className="text-sm font-semibold">Continue</span>
             <span className="grid place-items-center h-9 w-9 rounded-full bg-zinc-900/15">
@@ -397,7 +397,7 @@ function AuthScreen({ mode, setMode, onBack }: AuthScreenProps) {
                   {/* Shimmer sweep on hover — gold tint, theme-agnostic */}
                   <span
                     aria-hidden="true"
-                    className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 bg-gradient-to-r from-transparent via-primary/20 to-transparent skew-x-[-20deg] translate-x-[-50%] group-hover:translate-x-[400%] transition-transform duration-1000 ease-out"
+                    className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 bg-linear-to-r from-transparent via-primary/20 to-transparent skew-x-[-20deg] translate-x-[-50%] group-hover:translate-x-[400%] transition-transform duration-1000 ease-out"
                   />
                   <GoogleGlyph className="h-4 w-4 mr-2" />
                   <span className="relative">Continue with Google</span>
@@ -485,7 +485,7 @@ function Field({
         {label}
       </label>
       <div className="flex items-center gap-2 border-b border-border focus-within:border-primary transition-colors pb-1">
-        <span className="flex-shrink-0">{icon}</span>
+        <span className="shrink-0">{icon}</span>
         <input
           id={id}
           type={type}

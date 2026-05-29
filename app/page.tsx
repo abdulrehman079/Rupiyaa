@@ -68,7 +68,6 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Progress } from "@/components/ui/progress";
 
 // ═══════════════════════════════════════════════════════════════════
 // CONSTANTS & HELPERS
@@ -441,7 +440,7 @@ function SectionLabel({
   return (
     <div className={cn("flex items-center justify-between gap-2 mb-2 px-1", className)}>
       <div className="flex items-center gap-2 min-w-0">
-        <div className="h-4 w-1 rounded-full bg-primary flex-shrink-0" />
+        <div className="h-4 w-1 rounded-full bg-primary shrink-0" />
         <h2 className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground truncate">
           {children}
         </h2>
@@ -476,7 +475,7 @@ export default function App() {
 
 function AuthedApp() {
   const { user, logout } = useAuth();
-  const { data, setData, loaded, sync, wipe } = useAppData(SEED);
+  const { data, setData, loaded, sync } = useAppData(SEED);
 
   // ── State ────────────────────────────────────────────────────────
   const [view, setView] = useState("dashboard");
@@ -493,7 +492,6 @@ function AuthedApp() {
   const [txSearch, setTxSearch] = useState("");
   const [expandedSplits, setExpandedSplits] = useState<Set<string>>(new Set());
   const [friendOpenSection, setFriendOpenSection] = useState<"splits" | "loans" | "paid" | null>(null);
-  const isMobile = useIsMobile();
 
   const toggleSplitExpanded = (id: string) => {
     setExpandedSplits((prev) => {
@@ -1350,7 +1348,7 @@ function AuthedApp() {
           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full lg:h-9 lg:w-9" onClick={prevM}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <span className="text-sm font-semibold min-w-[100px] lg:min-w-[120px] text-center">{mLabel(month)}</span>
+          <span className="text-sm font-semibold min-w-25 lg:min-w-30 text-center">{mLabel(month)}</span>
           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full lg:h-9 lg:w-9" onClick={nextM}>
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -1362,7 +1360,7 @@ function AuthedApp() {
         <SectionLabel>Overview</SectionLabel>
 
         {/* Hero Net Pocket */}
-        <Card className="bg-gradient-to-br from-primary/25 via-primary/10 to-primary/5 border-primary/30 overflow-hidden relative">
+        <Card className="bg-linear-to-br from-primary/25 via-primary/10 to-primary/5 border-primary/30 overflow-hidden relative">
           <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-primary/10 blur-3xl" aria-hidden="true" />
           <CardHeader className="pb-2 relative">
             <CardDescription className="text-primary/90 text-xs uppercase tracking-wider font-semibold">Net Pocket</CardDescription>
@@ -1427,7 +1425,7 @@ function AuthedApp() {
             <CardHeader className="p-3 lg:p-6 pb-1 lg:pb-2">
               <CardDescription className="text-[10px] lg:text-sm">Income</CardDescription>
               <CardTitle className="text-sm lg:text-xl text-accent flex items-center gap-1 lg:gap-2 leading-tight">
-                <ArrowDownLeft className="h-3 w-3 lg:h-5 lg:w-5 flex-shrink-0" />
+                <ArrowDownLeft className="h-3 w-3 lg:h-5 lg:w-5 shrink-0" />
                 <span className="truncate">{PKR(monthIn)}</span>
               </CardTitle>
             </CardHeader>
@@ -1436,7 +1434,7 @@ function AuthedApp() {
             <CardHeader className="p-3 lg:p-6 pb-1 lg:pb-2">
               <CardDescription className="text-[10px] lg:text-sm">Expenses</CardDescription>
               <CardTitle className="text-sm lg:text-xl text-destructive flex items-center gap-1 lg:gap-2 leading-tight">
-                <ArrowUpRight className="h-3 w-3 lg:h-5 lg:w-5 flex-shrink-0" />
+                <ArrowUpRight className="h-3 w-3 lg:h-5 lg:w-5 shrink-0" />
                 <span className="truncate">{PKR(monthOut)}</span>
               </CardTitle>
             </CardHeader>
@@ -1459,11 +1457,11 @@ function AuthedApp() {
           </CardHeader>
           <CardContent>
             {catData.length === 0 ? (
-              <div className="h-[200px] flex items-center justify-center text-muted-foreground">
+              <div className="h-50 flex items-center justify-center text-muted-foreground">
                 No expenses this month
               </div>
             ) : (
-              <div className="h-[200px]">
+              <div className="h-50">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={catData.slice(0, 6)} layout="vertical">
                     <XAxis type="number" hide />
@@ -1498,7 +1496,7 @@ function AuthedApp() {
             <CardTitle className="text-base">6-Month Trend</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[200px]">
+            <div className="h-50">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={monthHistory}>
                   <defs>
@@ -1603,7 +1601,7 @@ function AuthedApp() {
       {/* SUMMARY */}
       <section className="flex flex-col gap-3 lg:gap-4">
         <SectionLabel>Summary</SectionLabel>
-        <Card className="bg-gradient-to-br from-primary/15 via-primary/5 to-transparent border-primary/20 overflow-hidden relative">
+        <Card className="bg-linear-to-br from-primary/15 via-primary/5 to-transparent border-primary/20 overflow-hidden relative">
           <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-primary/10 blur-2xl" aria-hidden="true" />
           <CardHeader className="pb-2 relative">
             <CardDescription className="text-primary/90 text-xs uppercase tracking-wider font-semibold">Total Balance</CardDescription>
@@ -1628,7 +1626,7 @@ function AuthedApp() {
             <div className="absolute top-0 left-0 w-1 h-full" style={{ backgroundColor: a.color }} />
             <CardContent className="p-3 pl-4 flex items-center gap-3">
               <div
-                className="w-11 h-11 rounded-full grid place-items-center flex-shrink-0"
+                className="w-11 h-11 rounded-full grid place-items-center shrink-0"
                 style={{ backgroundColor: `${a.color}22`, color: a.color }}
               >
                 <CreditCard className="h-5 w-5" />
@@ -1637,7 +1635,7 @@ function AuthedApp() {
                 <p className="font-semibold truncate">{a.name}</p>
                 <p className="text-[11px] text-muted-foreground">{a.type}</p>
               </div>
-              <div className="text-right flex-shrink-0">
+              <div className="text-right shrink-0">
                 <p className="font-mono font-semibold text-sm" style={{ color: a.color }}>
                   {PKR(a.balance)}
                 </p>
@@ -1721,7 +1719,7 @@ function AuthedApp() {
           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full lg:h-9 lg:w-9" onClick={prevM}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <span className="text-sm font-semibold min-w-[100px] text-center lg:hidden">{mLabel(month)}</span>
+          <span className="text-sm font-semibold min-w-25 text-center lg:hidden">{mLabel(month)}</span>
           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full lg:h-9 lg:w-9" onClick={nextM}>
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -1785,7 +1783,7 @@ function AuthedApp() {
 
       <Card>
         <CardContent className="p-0">
-          <ScrollArea className="h-[500px] lg:h-[600px]">
+          <ScrollArea className="h-125 lg:h-150">
             {(() => {
               const q = txSearch.trim().toLowerCase();
               const filtered = q
@@ -1842,7 +1840,7 @@ function AuthedApp() {
                   <div key={dateKey} className="w-full min-w-0">
                     <div className="sticky top-0 z-10 flex items-center justify-between gap-2 px-4 py-2 bg-secondary/80 backdrop-blur border-b border-border w-full min-w-0">
                       <span className="text-xs font-semibold text-foreground truncate">{dateLabel(dateKey)}</span>
-                      <span className={cn("text-xs font-mono whitespace-nowrap flex-shrink-0", dayNet >= 0 ? "text-accent" : "text-destructive")}>
+                      <span className={cn("text-xs font-mono whitespace-nowrap shrink-0", dayNet >= 0 ? "text-accent" : "text-destructive")}>
                         {dayNet >= 0 ? "+" : "−"}{PKR(dayNet)}
                       </span>
                     </div>
@@ -1860,20 +1858,20 @@ function AuthedApp() {
                             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); editTx(tx); } }}
                             className="flex items-center gap-2.5 p-3 lg:p-4 hover:bg-secondary/50 transition-colors group cursor-pointer w-full min-w-0"
                           >
-                            <div className="w-9 h-9 lg:w-10 lg:h-10 rounded-full bg-secondary flex items-center justify-center text-base lg:text-lg flex-shrink-0">
+                            <div className="w-9 h-9 lg:w-10 lg:h-10 rounded-full bg-secondary flex items-center justify-center text-base lg:text-lg shrink-0">
                               {CAT_ICONS[tx.category] || "📌"}
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-1.5 min-w-0">
                                 <p className="font-medium truncate text-sm">{tx.desc || tx.category}</p>
-                                {tx.splitId && <Badge variant="secondary" className="text-[9px] px-1.5 py-0 flex-shrink-0">Split</Badge>}
+                                {tx.splitId && <Badge variant="secondary" className="text-[9px] px-1.5 py-0 shrink-0">Split</Badge>}
                               </div>
                               <p className="text-[11px] text-muted-foreground truncate">
                                 {acc?.name} · {tx.category}
                                 {payer && ` · ${payer.name} paid`}
                               </p>
                             </div>
-                            <p className={cn("font-mono font-semibold text-sm flex-shrink-0 whitespace-nowrap", isIncome ? "text-accent" : "text-destructive")}>
+                            <p className={cn("font-mono font-semibold text-sm shrink-0 whitespace-nowrap", isIncome ? "text-accent" : "text-destructive")}>
                               {isIncome ? "+" : "−"}{PKR(tx.amount)}
                             </p>
                             <div className="hidden lg:flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1983,17 +1981,17 @@ function AuthedApp() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
                       <p className="font-semibold text-sm lg:text-base truncate">{sp.title}</p>
-                      {allDone && <Badge className="bg-accent/20 text-accent border-accent/30 text-[9px] px-1.5 py-0 flex-shrink-0">Settled</Badge>}
+                      {allDone && <Badge className="bg-accent/20 text-accent border-accent/30 text-[9px] px-1.5 py-0 shrink-0">Settled</Badge>}
                     </div>
                     <p className="text-[11px] lg:text-xs text-muted-foreground truncate">
                       {sp.date} · Paid by {gName(sp.paidBy)} · {sp.participants.length} people
                     </p>
                   </div>
-                  <div className="text-right flex-shrink-0">
+                  <div className="text-right shrink-0">
                     <p className="text-sm lg:text-base font-bold font-mono text-primary leading-tight whitespace-nowrap">{PKR(sp.total)}</p>
                     {!allDone && <p className="text-[10px] text-destructive whitespace-nowrap">{PKR(pendingAmt)} due</p>}
                   </div>
-                  <ChevronDown className={cn("h-4 w-4 text-muted-foreground flex-shrink-0 transition-transform duration-200", isExpanded && "rotate-180")} />
+                  <ChevronDown className={cn("h-4 w-4 text-muted-foreground shrink-0 transition-transform duration-200", isExpanded && "rotate-180")} />
                 </button>
                 {isExpanded && (
                 <CardContent className="border-t border-border bg-secondary/20 pt-3 pb-3 lg:pt-4 lg:pb-4">
@@ -2014,7 +2012,7 @@ function AuthedApp() {
                           "flex items-center gap-2.5 p-2.5 rounded-lg",
                           p.settled ? "bg-accent/5 border border-accent/10" : "bg-background"
                         )}>
-                          <Avatar className="h-7 w-7 flex-shrink-0">
+                          <Avatar className="h-7 w-7 shrink-0">
                             <AvatarFallback style={{ backgroundColor: gColor(p.id) }} className="text-white text-[10px]">
                               {inits(gName(p.id))}
                             </AvatarFallback>
@@ -2025,14 +2023,14 @@ function AuthedApp() {
                               {p.id === sp.paidBy && <span className="ml-1.5 text-[9px] uppercase tracking-wider text-muted-foreground">paid</span>}
                             </p>
                           </div>
-                          <p className="font-mono font-semibold text-xs lg:text-sm flex-shrink-0">{PKR(p.share)}</p>
+                          <p className="font-mono font-semibold text-xs lg:text-sm shrink-0">{PKR(p.share)}</p>
                           {p.settled ? (
-                            <Badge className="bg-accent/20 text-accent text-[9px] px-1.5 py-0 flex-shrink-0">✓</Badge>
+                            <Badge className="bg-accent/20 text-accent text-[9px] px-1.5 py-0 shrink-0">✓</Badge>
                           ) : showPayRecv ? (
                             <Button
                               size="sm"
                               variant={incoming ? "default" : "destructive"}
-                              className="text-[10px] h-6 px-2 flex-shrink-0"
+                              className="text-[10px] h-6 px-2 shrink-0"
                               onClick={() => toggleSettled(sp.id, p.id)}
                             >
                               {incoming ? "Receive" : "Pay"}
@@ -2152,7 +2150,7 @@ function AuthedApp() {
               <Card key={ln.id} className="group">
                 <CardContent className="p-3 lg:p-4">
                   <div className="flex items-center gap-3 lg:gap-4">
-                    <Avatar className="h-10 w-10 lg:h-12 lg:w-12 flex-shrink-0">
+                    <Avatar className="h-10 w-10 lg:h-12 lg:w-12 shrink-0">
                       <AvatarFallback style={{ backgroundColor: friend?.color || "#888" }} className="text-white text-sm">
                         {inits(friend?.name || "?")}
                       </AvatarFallback>
@@ -2169,7 +2167,7 @@ function AuthedApp() {
                         <p className="text-xs text-muted-foreground truncate">{ln.date}{ln.desc ? ` · ${ln.desc}` : ""}</p>
                       </div>
                     </div>
-                    <div className="text-right flex-shrink-0">
+                    <div className="text-right shrink-0">
                       <p className={cn("text-base lg:text-xl font-bold font-mono leading-tight", isLent ? "text-accent" : "text-destructive")}>
                         {PKR(ln.amount)}
                       </p>
@@ -2317,22 +2315,22 @@ function AuthedApp() {
                               <p className="font-medium text-xs lg:text-sm truncate">{sp.title}</p>
                               <p className="text-[10px] text-muted-foreground">{sp.date}</p>
                             </div>
-                            <p className="font-mono font-semibold text-xs lg:text-sm flex-shrink-0">
+                            <p className="font-mono font-semibold text-xs lg:text-sm shrink-0">
                               {PKR(part?.share || 0)}
                             </p>
                             {part?.settled ? (
-                              <Badge className="bg-accent/20 text-accent text-[9px] px-1.5 py-0 flex-shrink-0">✓</Badge>
+                              <Badge className="bg-accent/20 text-accent text-[9px] px-1.5 py-0 shrink-0">✓</Badge>
                             ) : canSettle ? (
                               <Button
                                 size="sm"
                                 variant={incoming ? "default" : "destructive"}
-                                className="text-[10px] h-6 px-2 flex-shrink-0"
+                                className="text-[10px] h-6 px-2 shrink-0"
                                 onClick={() => partId && toggleSettled(sp.id, partId)}
                               >
                                 {incoming ? "Receive" : "Pay"}
                               </Button>
                             ) : (
-                              <Badge variant="outline" className="text-[9px] px-1.5 py-0 flex-shrink-0">•</Badge>
+                              <Badge variant="outline" className="text-[9px] px-1.5 py-0 shrink-0">•</Badge>
                             )}
                           </div>
                         );
@@ -2375,12 +2373,12 @@ function AuthedApp() {
                               </div>
                               <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{ln.date}{ln.desc ? ` · ${ln.desc}` : ""}</p>
                             </div>
-                            <p className={cn("font-mono font-semibold text-xs lg:text-sm flex-shrink-0", incoming ? "text-accent" : "text-destructive")}>{PKR(ln.amount)}</p>
+                            <p className={cn("font-mono font-semibold text-xs lg:text-sm shrink-0", incoming ? "text-accent" : "text-destructive")}>{PKR(ln.amount)}</p>
                             {!ln.settled && (
                               <Button
                                 size="sm"
                                 variant={incoming ? "default" : "destructive"}
-                                className="text-[10px] h-6 px-2 flex-shrink-0"
+                                className="text-[10px] h-6 px-2 shrink-0"
                                 onClick={() => toggleLoanSettled(ln.id)}
                               >
                                 {incoming ? "Receive" : "Pay"}
@@ -2417,13 +2415,13 @@ function AuthedApp() {
                             <p className="font-medium text-xs lg:text-sm truncate">{tx.desc || tx.category}</p>
                             <p className="text-[10px] text-muted-foreground">{tx.date}</p>
                           </div>
-                          <p className={cn("font-mono font-semibold text-xs lg:text-sm flex-shrink-0", tx.settled ? "text-accent" : "text-destructive")}>
+                          <p className={cn("font-mono font-semibold text-xs lg:text-sm shrink-0", tx.settled ? "text-accent" : "text-destructive")}>
                             {PKR(tx.amount)}
                           </p>
                           {tx.settled ? (
-                            <Badge className="bg-accent/20 text-accent text-[9px] px-1.5 py-0 flex-shrink-0">✓</Badge>
+                            <Badge className="bg-accent/20 text-accent text-[9px] px-1.5 py-0 shrink-0">✓</Badge>
                           ) : (
-                            <Button size="sm" variant="destructive" className="text-[10px] h-6 px-2 flex-shrink-0" onClick={() => toggleTxSettled(tx.id)}>
+                            <Button size="sm" variant="destructive" className="text-[10px] h-6 px-2 shrink-0" onClick={() => toggleTxSettled(tx.id)}>
                               Pay
                             </Button>
                           )}
@@ -2496,7 +2494,7 @@ function AuthedApp() {
               <Card key={f.id} className="group cursor-pointer hover:bg-secondary/50 transition-colors" onClick={() => setSelFriend(f.id)}>
                 <CardContent className="p-3 lg:p-4">
                   <div className="flex items-center gap-3 lg:gap-4">
-                    <Avatar className="h-10 w-10 lg:h-12 lg:w-12 flex-shrink-0">
+                    <Avatar className="h-10 w-10 lg:h-12 lg:w-12 shrink-0">
                       <AvatarFallback style={{ backgroundColor: f.color }} className="text-white font-bold text-sm">
                         {inits(f.name)}
                       </AvatarFallback>
@@ -2507,7 +2505,7 @@ function AuthedApp() {
                         {f.phone ? `${f.phone} · ` : ""}{fCount} bill{fCount !== 1 ? "s" : ""}
                       </p>
                     </div>
-                    <div className="text-right flex-shrink-0">
+                    <div className="text-right shrink-0">
                       {debt !== 0 ? (
                         <>
                           <p className="text-[10px] lg:text-xs text-muted-foreground">{debt > 0 ? "Owes you" : "You owe"}</p>
@@ -2659,10 +2657,17 @@ function AuthedApp() {
     };
 
     const wipeData = async () => {
+      if (!user) return;
       if (!window.confirm("Delete ALL your data from the cloud? This cannot be undone.")) return;
       if (!window.confirm("Really sure? Your accounts, transactions, splits, loans and friends will all be erased.")) return;
+      const empty = { accounts: [], transactions: [], friends: [], splits: [], loans: [] };
+      // 1. Clear local state immediately — the auto-sync effect inside useAppData
+      //    will also push this to RTDB after its 500ms debounce.
+      setData(empty);
+      // 2. Also fire an immediate cloud write so the user gets a definitive
+      //    success/failure alert in this handler, no waiting for the debounce.
       try {
-        await wipe();
+        await dbSet(dbRef(rtdb, `users/${user.uid}/data`), empty);
         alert("All data erased.");
       } catch (e) {
         const msg = (e as { message?: string })?.message || "unknown error";
@@ -2701,7 +2706,7 @@ function AuthedApp() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-primary/15 text-primary grid place-items-center text-xl font-bold flex-shrink-0">
+              <div className="w-14 h-14 rounded-2xl bg-primary/15 text-primary grid place-items-center text-xl font-bold shrink-0">
                 {(user?.displayName?.[0] || user?.email?.[0] || "U").toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
@@ -2999,7 +3004,7 @@ function AuthedApp() {
   return (
     <div className="flex min-h-screen bg-background">
       {/* Desktop Sidebar — locked to viewport, never scrolls with content */}
-      <aside className="hidden lg:flex w-64 flex-col bg-sidebar border-r border-sidebar-border sticky top-0 h-screen self-start flex-shrink-0">
+      <aside className="hidden lg:flex w-64 flex-col bg-sidebar border-r border-sidebar-border sticky top-0 h-screen self-start shrink-0">
         <SidebarContent />
       </aside>
 
@@ -3009,7 +3014,7 @@ function AuthedApp() {
         style={{ paddingTop: "env(safe-area-inset-top)" }}
       >
         <div className="h-14 px-3 flex items-center gap-3">
-          <img src="/logo.png" alt="Rupiyaa" className="w-9 h-9 rounded-xl object-cover flex-shrink-0" />
+          <img src="/logo.png" alt="Rupiyaa" className="w-9 h-9 rounded-xl object-cover shrink-0" />
           <div className="flex-1 min-w-0 leading-tight">
             <h1 className="text-lg font-bold text-primary leading-tight">Rupiyaa</h1>
             <p className="text-xs text-muted-foreground truncate flex items-center gap-1.5">
@@ -3316,7 +3321,7 @@ function AuthedApp() {
                     return (
                       <div key={id} className="flex items-center gap-2">
                         <span className="text-sm flex-1 truncate min-w-0">{gName(id)}</span>
-                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <div className="flex items-center gap-1.5 shrink-0">
                           <Input
                             type="number"
                             inputMode="decimal"
@@ -3586,7 +3591,7 @@ function AuthedApp() {
           {/* Drawer profile + sign-out — anchored to the bottom */}
           <div className="border-t border-sidebar-border p-4 space-y-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/15 text-primary grid place-items-center text-sm font-semibold flex-shrink-0">
+              <div className="w-10 h-10 rounded-full bg-primary/15 text-primary grid place-items-center text-sm font-semibold shrink-0">
                 {(user?.displayName?.[0] || user?.email?.[0] || "U").toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
