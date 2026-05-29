@@ -108,22 +108,37 @@ export function useAppData<T extends AppDataShape>(seed: T) {
         }
 
         // Cloud is empty for this user.
-        // Bootstrap with current local (if any), legacy unkeyed local (one-time
-        // migration), or the seed — in that order of preference.
-        const fromLocal = local || readLocal(seed, LEGACY_KEY) || seed;
-        skipNextWrite.current = false;
-        setData(fromLocal);
-        writeLocal(key, fromLocal);
-        try {
-          const clean = stripUndefined(fromLocal);
-          await set(userRef, clean);
-          lastCloudJson.current = JSON.stringify(normalize(seed, clean));
-          if (typeof window !== "undefined") localStorage.removeItem(LEGACY_KEY);
-          setSync("synced");
-        } catch {
-          setSync("offline");
+        // One-time legacy migration: if the pre-auth localStorage key has
+        // data, upload it to cloud and clear it. Happens at most once per
+        // device.
+        const legacy = readLocal(seed, LEGACY_KEY);
+        if (legacy) {
+          skipNextWrite.current = false;
+          setData(legacy);
+          writeLocal(key, legacy);
+          try {
+            const clean = stripUndefined(legacy);
+            await set(userRef, clean);
+            lastCloudJson.current = JSON.stringify(normalize(seed, clean));
+            if (typeof window !== "undefined") localStorage.removeItem(LEGACY_KEY);
+            setSync("synced");
+          } catch {
+            setSync("offline");
+          }
+          setLoaded(true);
+          return;
         }
+
+        // Truly empty: brand-new account OR user just erased their data.
+        // Do NOT restore from per-user local cache — that would defeat the
+        // Erase button (which is the bug the user reported). Treat cloud as
+        // authoritative: clear state and the per-user local cache to seed.
+        skipNextWrite.current = true;
+        lastCloudJson.current = JSON.stringify(normalize(seed, seed));
+        setData(seed);
+        writeLocal(key, seed);
         setLoaded(true);
+        setSync("synced");
       },
       () => {
         // Permission denied or network down — local copy is already loaded;

@@ -224,65 +224,14 @@ interface AppData {
 // SEED DATA
 // ═══════════════════════════════════════════════════════════════════
 
+// New users (and post-erase users) start with a completely empty workspace.
+// No demo data, no placeholder accounts/friends/transactions.
 const SEED: AppData = {
-  accounts: [
-    { id: "a1", name: "Meezan Bank", type: "Bank", balance: 150000, color: "#00c896" },
-    { id: "a2", name: "Jazz Cash", type: "Wallet", balance: 25000, color: "#7c6eff" },
-    { id: "a3", name: "Cash in Hand", type: "Cash", balance: 8500, color: "#e9a825" },
-  ],
-  transactions: [
-    { id: "t1", accountId: "a1", type: "income", amount: 80000, category: "Salary", desc: "Monthly salary – May", date: "2026-05-01" },
-    { id: "t2", accountId: "a1", type: "expense", amount: 15000, category: "Rent", desc: "Monthly rent", date: "2026-05-01" },
-    { id: "t3", accountId: "a1", type: "expense", amount: 2500, category: "Food & Dining", desc: "Lunch at Burns Road", date: "2026-05-07" },
-    { id: "t4", accountId: "a1", type: "expense", amount: 1200, category: "Transport", desc: "Uber rides", date: "2026-05-06" },
-    { id: "t5", accountId: "a2", type: "expense", amount: 5000, category: "Shopping", desc: "Clothes from Zara", date: "2026-05-05" },
-    { id: "t6", accountId: "a3", type: "expense", amount: 800, category: "Food & Dining", desc: "Street food", date: "2026-05-04" },
-    { id: "t7", accountId: "a1", type: "expense", amount: 3500, category: "Utilities", desc: "Electricity & Internet", date: "2026-05-03" },
-    { id: "t8", accountId: "a2", type: "income", amount: 12000, category: "Freelance", desc: "Web project payment", date: "2026-04-28" },
-    { id: "t9", accountId: "a1", type: "expense", amount: 4200, category: "Health", desc: "Pharmacy & lab tests", date: "2026-04-22" },
-    { id: "t10", accountId: "a1", type: "expense", amount: 1800, category: "Food & Dining", desc: "Team lunch (Sara paid)", date: "2026-05-08", paidBy: "f2", settled: false },
-  ],
-  friends: [
-    { id: "f1", name: "Ali Hassan", color: "#7c6eff", phone: "0300-1234567" },
-    { id: "f2", name: "Sara Ahmed", color: "#ff6b9d", phone: "0321-9876543" },
-    { id: "f3", name: "Bilal Raza", color: "#00c896", phone: "0333-4567890" },
-  ],
-  splits: [
-    {
-      id: "s1",
-      title: "Dinner at Kolachi",
-      desc: "Group outing",
-      date: "2026-05-03",
-      total: 12000,
-      paidBy: "me",
-      splitType: "equal",
-      participants: [
-        { id: "me", share: 3000, settled: true },
-        { id: "f1", share: 3000, settled: false },
-        { id: "f2", share: 3000, settled: true },
-        { id: "f3", share: 3000, settled: false },
-      ],
-    },
-    {
-      id: "s2",
-      title: "Trip to Murree",
-      desc: "Hotel + fuel",
-      date: "2026-04-20",
-      total: 40000,
-      paidBy: "f1",
-      splitType: "shares",
-      participants: [
-        { id: "me", share: 10000, settled: false },
-        { id: "f1", share: 10000, settled: true },
-        { id: "f2", share: 10000, settled: true },
-        { id: "f3", share: 10000, settled: false },
-      ],
-    },
-  ],
-  loans: [
-    { id: "l1", friendId: "f3", direction: "lent", amount: 7000, desc: "Emergency cash", date: "2026-05-02", accountId: "a1", settled: false },
-    { id: "l2", friendId: "f1", direction: "borrowed", amount: 5000, desc: "Covered my phone bill", date: "2026-04-25", accountId: "a2", settled: false },
-  ],
+  accounts: [],
+  transactions: [],
+  friends: [],
+  splits: [],
+  loans: [],
 };
 
 // ═══════════════════════════════════════════════════════════════════
@@ -2661,11 +2610,20 @@ function AuthedApp() {
       if (!window.confirm("Delete ALL your data from the cloud? This cannot be undone.")) return;
       if (!window.confirm("Really sure? Your accounts, transactions, splits, loans and friends will all be erased.")) return;
       const empty = { accounts: [], transactions: [], friends: [], splits: [], loans: [] };
-      // 1. Clear local state immediately — the auto-sync effect inside useAppData
-      //    will also push this to RTDB after its 500ms debounce.
+      // 1. Clear local state.
       setData(empty);
-      // 2. Also fire an immediate cloud write so the user gets a definitive
-      //    success/failure alert in this handler, no waiting for the debounce.
+      // 2. Clear localStorage too so no stale demo/legacy data can resurrect
+      //    on the next page load.
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.removeItem(`rupiyaa-v2-${user.uid}`);
+          localStorage.removeItem("rupiyaa-v2");
+        } catch {
+          // ignore quota / disabled storage
+        }
+      }
+      // 3. Write empty to the cloud immediately so the user gets a definitive
+      //    success/failure alert here, not after the auto-sync debounce.
       try {
         await dbSet(dbRef(rtdb, `users/${user.uid}/data`), empty);
         alert("All data erased.");
