@@ -476,7 +476,7 @@ export default function App() {
 
 function AuthedApp() {
   const { user, logout } = useAuth();
-  const { data, setData, loaded, sync } = useAppData(SEED);
+  const { data, setData, loaded, sync, wipe } = useAppData(SEED);
 
   // ── State ────────────────────────────────────────────────────────
   const [view, setView] = useState("dashboard");
@@ -672,7 +672,8 @@ function AuthedApp() {
   // ── Handlers ─────────────────────────────────────────────────────
 
   const doAddAccount = () => {
-    if (!form.name || form.balance === undefined || form.balance === "") return;
+    if (!form.name) { alert("Please enter an account name."); return; }
+    if (form.balance === undefined || form.balance === "") { alert("Please enter an initial balance (0 is fine)."); return; }
     if (form.id) {
       upd(
         "accounts",
@@ -706,7 +707,9 @@ function AuthedApp() {
   };
 
   const doAddTx = () => {
-    if (!form.amount || !form.category || !form.accountId) return;
+    if (!form.amount) { alert("Please enter an amount."); return; }
+    if (!form.category) { alert("Please pick a category."); return; }
+    if (!form.accountId) { alert("Please pick an account."); return; }
     const amt = +form.amount;
     const type = form.txType || "expense";
     const paidBy = type === "expense" ? form.paidBy || "me" : "me";
@@ -873,7 +876,7 @@ function AuthedApp() {
   };
 
   const doAddFriend = () => {
-    if (!form.name) return;
+    if (!form.name) { alert("Please enter a name."); return; }
     if (form.id) {
       upd(
         "friends",
@@ -911,7 +914,10 @@ function AuthedApp() {
   };
 
   const doAddSplit = () => {
-    if (!form.title || !form.total || !form.accountId || sParts.length < 2) return;
+    if (!form.title) { alert("Please enter a title for the split."); return; }
+    if (!form.total) { alert("Please enter the total amount."); return; }
+    if (!form.accountId) { alert("Please pick an account."); return; }
+    if (sParts.length < 2) { alert("A split needs at least 2 participants."); return; }
     const amt = +form.total;
 
     if (sType === "percent") {
@@ -1120,7 +1126,9 @@ function AuthedApp() {
 
   const doAddLoan = (dir?: string) => {
     const direction = dir || form.direction || "lent";
-    if (!form.amount || !form.friendId || !form.accountId) return;
+    if (!form.amount) { alert("Please enter an amount."); return; }
+    if (!form.friendId) { alert("Please pick a friend."); return; }
+    if (!form.accountId) { alert("Please pick an account."); return; }
     const amt = +form.amount;
 
     if (form.id) {
@@ -2650,10 +2658,16 @@ function AuthedApp() {
       URL.revokeObjectURL(url);
     };
 
-    const wipeData = () => {
+    const wipeData = async () => {
       if (!window.confirm("Delete ALL your data from the cloud? This cannot be undone.")) return;
       if (!window.confirm("Really sure? Your accounts, transactions, splits, loans and friends will all be erased.")) return;
-      setData({ accounts: [], transactions: [], friends: [], splits: [], loans: [] });
+      try {
+        await wipe();
+        alert("All data erased.");
+      } catch (e) {
+        const msg = (e as { message?: string })?.message || "unknown error";
+        alert("Erase failed: " + msg + "\n\nYour data was cleared locally but cloud rejected the write. Check Firebase Realtime Database rules.");
+      }
     };
 
     const themes: { id: "light" | "dark" | "system"; label: string; icon: typeof Sun }[] = [
@@ -3284,6 +3298,72 @@ function AuthedApp() {
                 ))}
               </div>
             </div>
+
+            {/* Per-participant inputs for non-equal split types */}
+            {sParts.length >= 2 && sType !== "equal" && (
+              <div className="space-y-2 bg-secondary/30 rounded-lg p-3 lg:p-4">
+                <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+                  {sType === "percent" && "Set Each Person's %"}
+                  {sType === "custom" && "Set Each Person's Amount (Rs.)"}
+                  {sType === "shares" && "Set Each Person's Share Count"}
+                </Label>
+                <div className="space-y-2">
+                  {sParts.map((id) => {
+                    const cfg = sCfg[id] || {};
+                    const valKey = sType === "percent" ? "pct" : sType === "custom" ? "amount" : "shares";
+                    const placeholder = sType === "percent" ? "0" : sType === "custom" ? "0" : "1";
+                    const suffix = sType === "percent" ? "%" : sType === "custom" ? "Rs." : "shares";
+                    return (
+                      <div key={id} className="flex items-center gap-2">
+                        <span className="text-sm flex-1 truncate min-w-0">{gName(id)}</span>
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          <Input
+                            type="number"
+                            inputMode="decimal"
+                            min="0"
+                            step={sType === "shares" ? "1" : "any"}
+                            placeholder={placeholder}
+                            value={cfg[valKey] ?? ""}
+                            onChange={(e) => updCfg(id, valKey, e.target.value === "" ? "" : Number(e.target.value))}
+                            className="h-8 w-24 text-right"
+                          />
+                          <span className="text-xs text-muted-foreground w-12">{suffix}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Live validation hints */}
+                {sType === "percent" && (() => {
+                  const tot = sParts.reduce((s, id) => s + +(sCfg[id]?.pct || 0), 0);
+                  const ok = Math.abs(tot - 100) <= 0.5;
+                  return (
+                    <p className={cn("text-xs pt-1", ok ? "text-accent" : "text-destructive")}>
+                      Total: {tot.toFixed(1)}% {ok ? "✓" : `(needs 100%, off by ${(100 - tot).toFixed(1)}%)`}
+                    </p>
+                  );
+                })()}
+                {sType === "custom" && form.total && (() => {
+                  const tot = sParts.reduce((s, id) => s + +(sCfg[id]?.amount || 0), 0);
+                  const target = +form.total;
+                  const ok = Math.abs(tot - target) <= Math.max(1, Math.round(target * 0.01));
+                  return (
+                    <p className={cn("text-xs pt-1", ok ? "text-accent" : "text-destructive")}>
+                      Total: {PKR(tot)} of {PKR(target)} {ok ? "✓" : `(off by ${PKR(Math.abs(target - tot))})`}
+                    </p>
+                  );
+                })()}
+                {sType === "shares" && (() => {
+                  const tot = sParts.reduce((s, id) => s + +(sCfg[id]?.shares || 1), 0);
+                  return (
+                    <p className="text-xs pt-1 text-muted-foreground">
+                      Total shares: {tot} (each share = {PKR(+(form.total || 0) / Math.max(tot, 1))})
+                    </p>
+                  );
+                })()}
+              </div>
+            )}
 
             {sParts.length >= 2 && (
               <div className="space-y-2 bg-secondary/50 rounded-lg p-4">
